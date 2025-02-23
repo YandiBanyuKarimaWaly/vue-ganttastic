@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div ref="chartArea">
     <div :class="[{ 'labels-in-column': !!labelColumnTitle }]">
       <g-gantt-label-column
         v-if="labelColumnTitle"
@@ -35,6 +35,11 @@
             <slot name="current-time-label" />
           </template>
         </g-gantt-current-time>
+        <g-gantt-cursor-time :left-offset="cursorLeftOffset" v-if="cursorTime">
+          <template #cursor-time-label>
+            <slot name="cursor-time-label" />
+          </template>
+        </g-gantt-cursor-time>
         <div class="g-gantt-rows-container">
           <slot />
           <!-- the g-gantt-row components go here -->
@@ -55,6 +60,7 @@ import {
   provide,
   ref,
   toRefs,
+  toValue,
   useSlots,
   type ComputedRef,
   type Ref,
@@ -66,11 +72,12 @@ import GGanttLabelColumn from "./GGanttLabelColumn.vue"
 import GGanttTimeaxis from "./GGanttTimeaxis.vue"
 import GGanttBarTooltip from "./GGanttBarTooltip.vue"
 import GGanttCurrentTime from "./GGanttCurrentTime.vue"
+import GGanttCursorTime from "./GGanttCursorTime.vue"
 
 import type { GanttBarObject } from "../types"
 import type { ColorSchemeKey } from "../color-schemes.js"
 
-import { useElementSize } from "@vueuse/core"
+import { useElementSize, templateRef, useMouseInElement } from "@vueuse/core"
 import { DEFAULT_DATE_FORMAT } from "../composables/useDayjsHelper"
 import { colorSchemes, type ColorScheme } from "../color-schemes.js"
 import {
@@ -88,6 +95,8 @@ export interface GGanttChartProps {
   barEnd: string
   currentTime?: boolean
   currentTimeLabel?: string
+  cursorTime?: boolean
+  cursorTimeLabel?: string
   dateFormat?: string | false
   width?: string
   hideTimeaxis?: boolean
@@ -112,6 +121,7 @@ export type GGanttChartConfig = ToRefs<Required<GGanttChartProps>> & {
 
 const props = withDefaults(defineProps<GGanttChartProps>(), {
   currentTimeLabel: "",
+  cursorTimeLabel: "",
   dateFormat: DEFAULT_DATE_FORMAT,
   precision: "day",
   width: "100%",
@@ -251,8 +261,12 @@ const emitBarEvent = (
   }
 }
 
+const chartArea = templateRef('chartArea')
 const ganttChart = ref<HTMLElement | null>(null)
 const chartSize = useElementSize(ganttChart)
+const { x: mouseX, isOutside: isMouseOutside } = useMouseInElement(chartArea)
+// TODO: Check with the label column
+const cursorLeftOffset = computed<number>((prev) =>  toValue(isMouseOutside) ? prev : toValue(mouseX))
 
 provide(CHART_ROWS_KEY, getChartRows)
 provide(CONFIG_KEY, {
