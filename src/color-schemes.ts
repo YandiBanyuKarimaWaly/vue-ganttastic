@@ -148,6 +148,19 @@ export const colorSchemes: Record<string, ColorScheme> = {
     markerCursorTime: "#000",
     text: "white",
     background: "white"
+  },
+
+  vuetify: {
+    primary: "rgb(var(--v-theme-primary))",
+    secondary: "rgb(var(--v-theme-primary-darken-1))",
+    ternary: "rgb(var(--v-theme-secondary))",
+    quartenary: "rgb(var(--v-theme-secondary-darken-1))",
+    hoverHighlight: "rgb(var(--v-theme-on-surface-light))",
+    markerCurrentTime: "rgb(var(--v-theme-on-primary))",
+    markerCursorTime: "rgb(var(--v-theme-on-primary))",
+    text: "rgb(var(--v-theme-on-primary))",
+    background: "rgb(var(--v-theme-surface-light))",
+    toast: "rgb(var(--v-theme-primary))"
   }
 }
 
