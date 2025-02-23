@@ -7,7 +7,7 @@
       position: 'absolute',
       top: `${rowHeight * 0.1}px`,
       left: `${xStart}px`,
-      width: `${xEnd - xStart}px`,
+      width: `${clampedWidth}px`,
       height: `${rowHeight * 0.8}px`,
       zIndex: isDragging ? 3 : 2
     }"
@@ -34,7 +34,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, toRefs, watch, onMounted, inject } from "vue"
+import { computed, ref, toRefs, watch, onMounted, inject, toValue } from "vue"
 
 import useBarDragManagement from "../composables/useBarDragManagement.js"
 import useTimePositionMapping from "../composables/useTimePositionMapping.js"
@@ -59,6 +59,10 @@ const { setDragLimitsOfGanttBar } = useBarDragLimit()
 const isDragging = ref(false)
 
 const barConfig = computed(() => bar.value.ganttBarConfig)
+
+function clamp(n: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, n))
+}
 
 function firstMousemoveCallback(e: MouseEvent) {
   barConfig.value.bundle != null ? initDragOfBundle(bar.value, e) : initDragOfBar(bar.value, e)
@@ -104,6 +108,18 @@ const { barStart, barEnd, width, chartStart, chartEnd, chartSize } = config
 
 const xStart = ref(0)
 const xEnd = ref(0)
+const barWidth = computed(() => Math.abs(toValue(xEnd)-toValue(xStart))) // In the off-chance something goes wrong
+const clampedWidth = computed(() =>  {
+  if (typeof barConfig.value.clampWidth === 'number') {
+    return clamp(toValue(barWidth), Math.abs(toValue(barConfig.value.clampWidth)), Infinity)
+  }
+
+  if (barConfig.value.clampWidth === true) {
+    return clamp(toValue(barWidth), toValue(rowHeight), Infinity)
+  }
+  
+  return toValue(barWidth)
+})
 
 onMounted(() => {
   watch(
