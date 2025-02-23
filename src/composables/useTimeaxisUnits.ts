@@ -8,6 +8,8 @@ export default function useTimeaxisUnits() {
 
   const upperPrecision = computed(() => {
     switch (precision?.value) {
+      case "minute":
+        return "hour"
       case "hour":
         return "day"
       case "day":
@@ -36,6 +38,7 @@ export default function useTimeaxisUnits() {
   })
 
   const displayFormats = {
+    minute: "mm",
     hour: "HH",
     date: "DD.MMM",
     day: "DD.MMM",
@@ -80,7 +83,8 @@ export default function useTimeaxisUnits() {
         : (endCurrentUpperUnit.diff(currentUpperUnit, "minutes", true) / totalMinutes) * 100
 
       upperUnits.push({
-        label: currentUpperUnit.format(displayFormats[upperUnit]),
+        // TODO: Do this more elegantly
+        label: currentUpperUnit.format(upperUnit === 'hour' ? 'DD.MMM THH' : displayFormats[upperUnit]),
         value: String(currentUpperUnit),
         date: currentUpperUnit.toDate(),
         width: String(upperWidth) + "%"

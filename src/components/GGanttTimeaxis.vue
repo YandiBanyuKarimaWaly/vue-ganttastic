@@ -25,8 +25,8 @@
         :style="{
           background: index % 2 === 0 ? colors.ternary : colors.quartenary,
           color: colors.text,
-          flexDirection: precision === 'hour' ? 'column' : 'row',
-          alignItems: precision === 'hour' ? '' : 'center',
+          flexDirection: (precision === 'hour' || precision === 'minute') ? 'column' : 'row',
+          alignItems: (precision === 'hour' || precision === 'minute') ? '' : 'center',
           width
         }"
       >
@@ -34,7 +34,7 @@
           {{ label }}
         </slot>
         <div
-          v-if="precision === 'hour'"
+          v-if="precision === 'hour' || precision === 'minute'"
           class="g-timeaxis-hour-pin"
           :style="{ background: colors.text }"
         />

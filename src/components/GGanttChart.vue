@@ -90,7 +90,7 @@ import {
 export interface GGanttChartProps {
   chartStart: string | Date
   chartEnd: string | Date
-  precision?: "hour" | "day" | "date" | "week" | "month"
+  precision?: "minute" | "hour" | "day" | "date" | "week" | "month"
   barStart: string
   barEnd: string
   currentTime?: boolean
